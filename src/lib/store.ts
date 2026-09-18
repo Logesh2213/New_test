@@ -1303,7 +1303,6 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'arkk-event-storage',
-      skipHydration: true,
       storage: typeof window !== 'undefined' 
         ? createJSONStorage(() => localStorage)
         : undefined,
