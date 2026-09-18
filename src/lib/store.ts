@@ -292,7 +292,10 @@ export const useStore = create<AppState>()(
       round6State: initialRound6State,
       
       // Actions
-      setCurrentUser: (user) => set({ currentUser: user }),
+      setCurrentUser: (user) => {
+        console.log('[Store] setCurrentUser called:', user?.username || 'null');
+        set({ currentUser: user });
+      },
 
       applyServerReset: (epoch?: number) => {
         const newEpoch = epoch || Date.now();
