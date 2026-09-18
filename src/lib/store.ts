@@ -519,6 +519,7 @@ export const useStore = create<AppState>()(
       })),
       
       startRound1A: () => {
+        console.log('[Store] startRound1A called');
         set((state) => ({
           round1AState: {
             ...state.round1AState,
@@ -535,11 +536,14 @@ export const useStore = create<AppState>()(
             submitted_answer: undefined,
             answer_timer_running: false,
             answer_timer_remaining: 0,
+            answer_timer_end_time: undefined,
+            evaluation_result: undefined,
+            award_amount: undefined,
           },
           eventState: {
             ...state.eventState,
             current_round: 1,
-            current_activity: 'Round 1A - Waiting for Question',
+            current_activity: 'Round 1A Started - Waiting for first question',
             event_status: 'in_progress',
           },
         }));

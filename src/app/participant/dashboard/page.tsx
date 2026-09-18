@@ -13,9 +13,17 @@ export default function ParticipantDashboardPage() {
   const wallets = useStore((state) => state.wallets);
   const eventState = useStore((state) => state.eventState);
   const scores = useStore((state) => state.scores);
-  const zones = useStore((state) => state.zones);
   const round1AState = useStore((state) => state.round1AState);
   const round1BState = useStore((state) => state.round1BState);
+  const round2State = useStore((state) => state.round2State);
+  const round3State = useStore((state) => state.round3State);
+  const round4State = useStore((state) => state.round4State);
+  const round5State = useStore((state) => state.round5State);
+  const round6State = useStore((state) => state.round6State);
+  
+  console.log('[ParticipantDashboard] Render - eventState.current_round:', eventState.current_round, 'round1AState.active:', round1AState.active);
+
+  const zones = useStore((state) => state.zones);
   const round1AStatus = round1AState?.status || (round1AState?.active ? (round1AState?.current_question_id ? 'QUESTION_DISPLAYED' : 'ROUND_STARTED_WAITING') : 'ROUND_NOT_STARTED');
 
   const isQuestionPhase =
@@ -41,13 +49,14 @@ export default function ParticipantDashboardPage() {
     isQuestionPhase;
 
   useEffect(() => {
-    syncRound1AWithServer();
-    syncRound1BWithServer();
-    const interval = setInterval(() => {
-      syncRound1AWithServer();
-      syncRound1BWithServer();
-    }, 1000);
-    return () => clearInterval(interval);
+    // DISABLED: Server sync causing continuous re-renders
+    // syncRound1AWithServer();
+    // syncRound1BWithServer();
+    // const interval = setInterval(() => {
+    //   syncRound1AWithServer();
+    //   syncRound1BWithServer();
+    // }, 1000);
+    // return () => clearInterval(interval);
   }, []);
   
   useEffect(() => {

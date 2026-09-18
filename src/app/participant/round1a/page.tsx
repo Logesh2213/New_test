@@ -20,6 +20,8 @@ export default function ParticipantRound1APage() {
   const submitRound1AAnswer = useStore((state) => state.submitRound1AAnswer);
   const timeoutRound1A = useStore((state) => state.timeoutRound1A);
   const placeRound1ABid = useStore((state) => state.placeRound1ABid);
+  
+  console.log('[ParticipantRound1A] Render - round1AState.active:', round1AState.active, 'status:', round1AState.status);
 
   // Participant Local State per Question
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -47,13 +49,14 @@ export default function ParticipantRound1APage() {
   }, [currentUser, router]);
 
   // 2. Real-time synchronization with server for Admin -> Participant flow
+  // DISABLED: Server sync causing continuous re-renders
   useEffect(() => {
-    syncRound1AWithServer();
-    const syncInterval = setInterval(() => {
-      syncRound1AWithServer();
-    }, 400);
+    // syncRound1AWithServer();
+    // const syncInterval = setInterval(() => {
+    //   syncRound1AWithServer();
+    // }, 400);
 
-    return () => clearInterval(syncInterval);
+    // return () => clearInterval(syncInterval);
   }, []);
 
   const round1AStatus = round1AState?.status || (round1AState?.active ? 'ROUND_STARTED_WAITING' : 'ROUND_NOT_STARTED');
