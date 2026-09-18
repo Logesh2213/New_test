@@ -333,15 +333,6 @@ export const useStore = create<AppState>()(
           fetch('/api/reset', {
             method: 'POST',
           }).catch(() => {});
-
-          try {
-            if (realtimeBroadcastChannel) {
-              realtimeBroadcastChannel.postMessage({
-                type: 'RESET_ALL_DATA',
-                epoch: newEpoch,
-              });
-            }
-          } catch (e) {}
         }
       },
       
