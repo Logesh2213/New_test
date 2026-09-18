@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import {
   User,
   Team,
@@ -257,45 +256,43 @@ const getInitialUser = (): User | null => {
 
 let realtimeBroadcastChannel: BroadcastChannel | null = null;
 
-export const useStore = create<AppState>()(
-  persist<AppState>(
-    (set, get) => ({
-      // Initial state
-      reset_epoch: 0,
-      users: [],
-      currentUser: getInitialUser(),
-      teams: [],
-      wallets: [],
-      transactions: [],
-      questions: standardQuestions.map((q) => ({ ...q })),
-      questionBids: [],
-      zones: [],
-      zoneTransactions: [],
-      resources: [],
-      teamResources: [],
-      storeItems: [],
-      purchases: [],
-      round2Waves: [],
-      round2Submissions: [],
-      proposals: [],
-      videos: [],
-      deals: [],
-      scores: [],
-      auditLogs: [],
-      eventState: initialEventState,
-      round1AState: initialRound1AState,
-      round1BState: initialRound1BState,
-      round2State: initialRound2State,
-      round3State: initialRound3State,
-      round4State: initialRound4State,
-      round5State: initialRound5State,
-      round6State: initialRound6State,
-      
-      // Actions
-      setCurrentUser: (user) => {
-        console.log('[Store] setCurrentUser called:', user?.username || 'null');
-        set({ currentUser: user });
-      },
+export const useStore = create<AppState>((set, get) => ({
+  // Initial state
+  reset_epoch: 0,
+  users: [],
+  currentUser: getInitialUser(),
+  teams: [],
+  wallets: [],
+  transactions: [],
+  questions: standardQuestions.map((q) => ({ ...q })),
+  questionBids: [],
+  zones: [],
+  zoneTransactions: [],
+  resources: [],
+  teamResources: [],
+  storeItems: [],
+  purchases: [],
+  round2Waves: [],
+  round2Submissions: [],
+  proposals: [],
+  videos: [],
+  deals: [],
+  scores: [],
+  auditLogs: [],
+  eventState: initialEventState,
+  round1AState: initialRound1AState,
+  round1BState: initialRound1BState,
+  round2State: initialRound2State,
+  round3State: initialRound3State,
+  round4State: initialRound4State,
+  round5State: initialRound5State,
+  round6State: initialRound6State,
+  
+  // Actions
+  setCurrentUser: (user) => {
+    console.log('[Store] setCurrentUser called:', user?.username || 'null');
+    set({ currentUser: user });
+  },
 
       applyServerReset: (epoch?: number) => {
         const newEpoch = epoch || Date.now();
@@ -1295,45 +1292,8 @@ export const useStore = create<AppState>()(
           timestamp: new Date().toISOString(),
         });
       },
-    }),
-    {
-      name: 'arkk-event-storage',
-      // DISABLED: Causing hydration loop on Vercel
-      // partialize: (state) => {
-      //   const { currentUser, ...rest } = state;
-      //   return rest as AppState;
-      // },
-      // merge: (persistedState: unknown, currentState: AppState): AppState => {
-      //   const persisted = (persistedState as Partial<AppState>) || {};
-      //   const pQuestions = (persisted as { questions?: Question[] }).questions;
-      //   const hasValidQuestions =
-      //     Array.isArray(pQuestions) &&
-      //     pQuestions.length === standardQuestions.length &&
-      //     pQuestions[0]?.question_text === standardQuestions[0]?.question_text;
-
-      //   return {
-      //     ...currentState,
-      //     ...persisted,
-      //     questions: hasValidQuestions
-      //       ? (pQuestions as Question[])
-      //       : standardQuestions.map((q) => ({ ...q })),
-      //     currentUser: currentState.currentUser || getInitialUser(),
-      //     round1AState: {
-      //       ...currentState.round1AState,
-      //       ...(persisted.round1AState || {}),
-      //       status:
-      //         persisted.round1AState?.status ||
-      //         (persisted.round1AState?.active
-      //           ? persisted.round1AState?.current_question_id
-      //             ? 'QUESTION_DISPLAYED'
-      //             : 'ROUND_STARTED_WAITING'
-      //           : 'ROUND_NOT_STARTED'),
-      //     },
-      //   };
-      // },
-    }
-  )
-);
+    })
+  );
 
 // Real-time synchronization across browser tabs and windows
 // DISABLED for Vercel deployment to prevent screen flickering
