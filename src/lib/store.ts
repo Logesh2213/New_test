@@ -1343,95 +1343,96 @@ export const useStore = create<AppState>()(
 );
 
 // Real-time synchronization across browser tabs and windows
-if (typeof window !== 'undefined') {
-  let isReceivingBroadcast = false;
+// DISABLED for Vercel deployment to prevent screen flickering
+// if (typeof window !== 'undefined') {
+//   let isReceivingBroadcast = false;
 
-  try {
-    if ('BroadcastChannel' in window) {
-      realtimeBroadcastChannel = new BroadcastChannel('arkk-realtime-sync');
-      realtimeBroadcastChannel.onmessage = (event) => {
-        if (event.data?.type === 'RESET_ALL_DATA') {
-          useStore.getState().applyServerReset(event.data.epoch);
-          return;
-        }
+//   try {
+//     if ('BroadcastChannel' in window) {
+//       realtimeBroadcastChannel = new BroadcastChannel('arkk-realtime-sync');
+//       realtimeBroadcastChannel.onmessage = (event) => {
+//         if (event.data?.type === 'RESET_ALL_DATA') {
+//           useStore.getState().applyServerReset(event.data.epoch);
+//           return;
+//         }
 
-        if (event.data?.type === 'SYNC_EVENT_DATA' && event.data?.payload) {
-          isReceivingBroadcast = true;
-          const payload = event.data.payload;
-          useStore.setState((state) => ({
-            ...state,
-            eventState: payload.eventState || state.eventState,
-            round1AState: payload.round1AState || state.round1AState,
-            round1BState: payload.round1BState || state.round1BState,
-            questions: payload.questions || state.questions,
-            teams: payload.teams || state.teams,
-            wallets: payload.wallets || state.wallets,
-            scores: payload.scores || state.scores,
-            zones: payload.zones || state.zones,
-            currentUser: state.currentUser || getInitialUser(),
-          }));
-          isReceivingBroadcast = false;
-        }
-      };
-    }
-  } catch (err) {
-    console.error('BroadcastChannel initialization error:', err);
-  }
+//         if (event.data?.type === 'SYNC_EVENT_DATA' && event.data?.payload) {
+//           isReceivingBroadcast = true;
+//           const payload = event.data.payload;
+//           useStore.setState((state) => ({
+//             ...state,
+//             eventState: payload.eventState || state.eventState,
+//             round1AState: payload.round1AState || state.round1AState,
+//             round1BState: payload.round1BState || state.round1BState,
+//             questions: payload.questions || state.questions,
+//             teams: payload.teams || state.teams,
+//             wallets: payload.wallets || state.wallets,
+//             scores: payload.scores || state.scores,
+//             zones: payload.zones || state.zones,
+//             currentUser: state.currentUser || getInitialUser(),
+//           }));
+//           isReceivingBroadcast = false;
+//         }
+//       };
+//     }
+//   } catch (err) {
+//     console.error('BroadcastChannel initialization error:', err);
+//   }
 
-  // Cross-window / tab fallback with localStorage storage event
-  window.addEventListener('storage', (event) => {
-    if (event.key === 'arkk-event-storage' && event.newValue) {
-      try {
-        const parsed = JSON.parse(event.newValue);
-        if (parsed?.state) {
-          const incoming = parsed.state;
-          if (incoming.reset_epoch && incoming.reset_epoch > (useStore.getState().reset_epoch || 0)) {
-            useStore.getState().applyServerReset(incoming.reset_epoch);
-            return;
-          }
+//   // Cross-window / tab fallback with localStorage storage event
+//   window.addEventListener('storage', (event) => {
+//     if (event.key === 'arkk-event-storage' && event.newValue) {
+//       try {
+//         const parsed = JSON.parse(event.newValue);
+//         if (parsed?.state) {
+//           const incoming = parsed.state;
+//           if (incoming.reset_epoch && incoming.reset_epoch > (useStore.getState().reset_epoch || 0)) {
+//             useStore.getState().applyServerReset(incoming.reset_epoch);
+//             return;
+//           }
 
-          useStore.setState((state) => ({
-            ...state,
-            eventState: incoming.eventState || state.eventState,
-            round1AState: incoming.round1AState || state.round1AState,
-            round1BState: incoming.round1BState || state.round1BState,
-            questions: incoming.questions || state.questions,
-            teams: incoming.teams || state.teams,
-            wallets: incoming.wallets || state.wallets,
-            scores: incoming.scores || state.scores,
-            zones: incoming.zones || state.zones,
-            currentUser: state.currentUser || getInitialUser(),
-          }));
-        }
-      } catch (err) {
-        useStore.persist.rehydrate();
-      }
-    }
-  });
+//           useStore.setState((state) => ({
+//             ...state,
+//             eventState: incoming.eventState || state.eventState,
+//             round1AState: incoming.round1AState || state.round1AState,
+//             round1BState: incoming.round1BState || state.round1BState,
+//             questions: incoming.questions || state.questions,
+//             teams: incoming.teams || state.teams,
+//             wallets: incoming.wallets || state.wallets,
+//             scores: incoming.scores || state.scores,
+//             zones: incoming.zones || state.zones,
+//             currentUser: state.currentUser || getInitialUser(),
+//           }));
+//         }
+//       } catch (err) {
+//         useStore.persist.rehydrate();
+//       }
+//     }
+//   });
 
-  // Notify other tabs on any state change with direct payload
-  useStore.subscribe((state) => {
-    if (!isReceivingBroadcast && realtimeBroadcastChannel) {
-      try {
-        realtimeBroadcastChannel.postMessage({
-          type: 'SYNC_EVENT_DATA',
-          payload: {
-            eventState: state.eventState,
-            round1AState: state.round1AState,
-            round1BState: state.round1BState,
-            questions: state.questions,
-            teams: state.teams,
-            wallets: state.wallets,
-            scores: state.scores,
-            zones: state.zones,
-          },
-        });
-      } catch (e) {
-        // Suppress postMessage error during unmount
-      }
-    }
-  });
-}
+//   // Notify other tabs on any state change with direct payload
+//   useStore.subscribe((state) => {
+//     if (!isReceivingBroadcast && realtimeBroadcastChannel) {
+//       try {
+//         realtimeBroadcastChannel.postMessage({
+//           type: 'SYNC_EVENT_DATA',
+//           payload: {
+//             eventState: state.eventState,
+//             round1AState: state.round1AState,
+//             round1BState: state.round1BState,
+//             questions: state.questions,
+//             teams: state.teams,
+//             wallets: state.wallets,
+//             scores: state.scores,
+//             zones: state.zones,
+//           },
+//         });
+//       } catch (e) {
+//         // Suppress postMessage error during unmount
+//       }
+//     }
+//   });
+// }
 
 export async function syncRound1AWithServer(): Promise<Round1AState | null> {
   if (typeof window === 'undefined') return null;
