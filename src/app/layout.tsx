@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import DataInitializer from "@/components/DataInitializer";
+import HydrationBoundary from "@/components/HydrationBoundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,15 +19,19 @@ export const metadata: Metadata = {
   description: "Live Event Management System for ARKK Best Management Team Competition",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <DataInitializer />
-        {children}
+        <HydrationBoundary>
+          <DataInitializer />
+          {children}
+        </HydrationBoundary>
       </body>
     </html>
   );

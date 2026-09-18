@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import {
   User,
   Team,
@@ -1300,6 +1300,10 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'arkk-event-storage',
+      skipHydration: true,
+      storage: typeof window !== 'undefined' 
+        ? createJSONStorage(() => localStorage)
+        : undefined,
       partialize: (state) => {
         // Exclude currentUser so each tab maintains its own independent session
         const { currentUser, ...rest } = state;
