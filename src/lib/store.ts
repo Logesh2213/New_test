@@ -1298,43 +1298,39 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'arkk-event-storage',
-      storage: typeof window !== 'undefined' 
-        ? createJSONStorage(() => localStorage)
-        : undefined,
-      partialize: (state) => {
-        // Exclude currentUser so each tab maintains its own independent session
-        const { currentUser, ...rest } = state;
-        return rest as AppState;
-      },
-      merge: (persistedState: unknown, currentState: AppState): AppState => {
-        const persisted = (persistedState as Partial<AppState>) || {};
-        const pQuestions = (persisted as { questions?: Question[] }).questions;
-        const hasValidQuestions =
-          Array.isArray(pQuestions) &&
-          pQuestions.length === standardQuestions.length &&
-          pQuestions[0]?.question_text === standardQuestions[0]?.question_text;
+      // DISABLED: Causing hydration loop on Vercel
+      // partialize: (state) => {
+      //   const { currentUser, ...rest } = state;
+      //   return rest as AppState;
+      // },
+      // merge: (persistedState: unknown, currentState: AppState): AppState => {
+      //   const persisted = (persistedState as Partial<AppState>) || {};
+      //   const pQuestions = (persisted as { questions?: Question[] }).questions;
+      //   const hasValidQuestions =
+      //     Array.isArray(pQuestions) &&
+      //     pQuestions.length === standardQuestions.length &&
+      //     pQuestions[0]?.question_text === standardQuestions[0]?.question_text;
 
-        return {
-          ...currentState,
-          ...persisted,
-          questions: hasValidQuestions
-            ? (pQuestions as Question[])
-            : standardQuestions.map((q) => ({ ...q })),
-          // Preserve local tab's currentUser
-          currentUser: currentState.currentUser || getInitialUser(),
-          round1AState: {
-            ...currentState.round1AState,
-            ...(persisted.round1AState || {}),
-            status:
-              persisted.round1AState?.status ||
-              (persisted.round1AState?.active
-                ? persisted.round1AState?.current_question_id
-                  ? 'QUESTION_DISPLAYED'
-                  : 'ROUND_STARTED_WAITING'
-                : 'ROUND_NOT_STARTED'),
-          },
-        };
-      },
+      //   return {
+      //     ...currentState,
+      //     ...persisted,
+      //     questions: hasValidQuestions
+      //       ? (pQuestions as Question[])
+      //       : standardQuestions.map((q) => ({ ...q })),
+      //     currentUser: currentState.currentUser || getInitialUser(),
+      //     round1AState: {
+      //       ...currentState.round1AState,
+      //       ...(persisted.round1AState || {}),
+      //       status:
+      //         persisted.round1AState?.status ||
+      //         (persisted.round1AState?.active
+      //           ? persisted.round1AState?.current_question_id
+      //             ? 'QUESTION_DISPLAYED'
+      //             : 'ROUND_STARTED_WAITING'
+      //           : 'ROUND_NOT_STARTED'),
+      //     },
+      //   };
+      // },
     }
   )
 );
